@@ -195,15 +195,16 @@ function Deposits() {
     if (!formRef.current) return;
     if (newDepositFetcher.state !== "idle") return;
 
-    // 🐨 If there's an error on the amount, focus the amount element
-
-    // 🐨 If there's an error on the desposit date, focus the depositDate element
-
-    // 🐨 Focus on the amount field
-    // 💯 In what situation would we want to *not* change focus and *not* reset the form at this point?
-
-    formRef.current.reset();
-  }, [newDepositFetcher.state]);
+    const formEl = formRef.current;
+    if (errors?.amount) {
+      formEl.elements.amount?.focus();
+    } else if (errors?.depositeDate) {
+      formEl.elements.depositDate?.focus();
+    } else if (document.activeElement === formEl.elements.intent) {
+      formEl.reset();
+      formEl.elements.amount?.focus();
+    }
+  }, [errors, newDepositFetcher.state]);
 
   return (
     <div>
@@ -273,6 +274,7 @@ function Deposits() {
             aria-errormessage={
               errors?.depositDate ? "depositDate-error" : undefined
             }
+            min={new Date().toISOString().split("T")[0]}
           />
         </div>
         <div className="grid grid-cols-1 gap-4 lg:col-span-2 lg:flex">
